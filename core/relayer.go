@@ -1,7 +1,7 @@
 package core
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 // Relayer is a relayer implementing the interchain service invocation between the application chain and Irita-Hub
@@ -22,82 +22,64 @@ func NewRelayer(iritaHubChain IritaHubChainI, appChain AppChainI, logger *log.Lo
 
 // BuildInterchainRequest builds an interchain request from an interchain event
 func (r Relayer) BuildInterchainRequest(icEvent InterchainEventI) (InterchainRequestI, error) {
+	serviceFee, err := r.AppChain.GetServiceFee(icEvent.GetServiceName(), icEvent.GetProvider())
+	if err != nil {
+		return nil, err
+	}
+
 	return InterchainRequestAdaptor{
 		ServiceName:   icEvent.GetServiceName(),
-		Provider:      "mock-provider",
+		Provider:      icEvent.GetProvider(),
 		Input:         icEvent.GetInput(),
 		Timeout:       icEvent.GetTimeout(),
-		ServiceFeeCap: "mock-service-fee-cap",
+		ServiceFeeCap: serviceFee,
 	}, nil
 }
 
 // HandleInterchainEvent handles the interchain event
 func (r Relayer) HandleInterchainEvent(icEvent InterchainEventI) {
-	response := ResponseAdaptor{}
-
-	r.Logger.Printf("got the interchain event on %s: %v", r.AppChain.GetChainID(), icEvent)
+	r.Logger.Printf("got the interchain event on %s: %+v", r.AppChain.GetChainID(), icEvent)
 
 	icRequest, err := r.BuildInterchainRequest(icEvent)
 	if err != nil {
 		r.Logger.Printf(
-			"failed to build the interchain request from the interchain event: %s",
+			"failed to build the interchain request: %s",
 			err,
 		)
 
-		response.ErrMsg = "invalid interchain event"
-	} else {
-		icRequestID, err := r.IritaHubChain.SendInterchainRequest(icRequest)
+		return
+	}
+
+	callback := func(icRequestID string, response ResponseI) {
+		r.Logger.Printf(
+			"got the response of the interchain request %s on %s: %+v",
+			icRequestID,
+			r.IritaHubChain.GetChainID(),
+			response,
+		)
+
+		err := r.AppChain.SendResponse(icEvent.GetInvocationID(), response)
 		if err != nil {
 			r.Logger.Printf(
-				"failed to send the interchain request %v to %s: %s",
-				icRequest,
-				r.IritaHubChain.GetChainID(),
+				"failed to send the response to %s: %s",
+				r.AppChain.GetChainID(),
 				err,
 			)
-
-			response.ErrMsg = "failed to send the interchain request to Hub"
 		} else {
 			r.Logger.Printf(
-				"interchain request %v sent to %s successfully: %s",
-				icRequest,
-				r.IritaHubChain.GetChainID(),
-				icRequestID,
+				"response sent to %s successfully",
+				r.AppChain.GetChainID(),
 			)
-
-			resp, err := r.IritaHubChain.ResponseListener(icRequestID)
-			if err != nil {
-				r.Logger.Printf(
-					"failed to get the response of the interchain request %s on %s: %s",
-					icRequestID,
-					r.IritaHubChain.GetChainID(),
-					err,
-				)
-
-				response.ErrMsg = "failed to receive the response from Hub"
-			} else {
-				r.Logger.Printf(
-					"got the response of the interchain request %s on %s: %v",
-					icRequestID,
-					r.IritaHubChain.GetChainID(),
-					resp,
-				)
-
-				response = resp.(ResponseAdaptor)
-			}
 		}
 	}
 
-	err = r.AppChain.SendResponse(icEvent.GetInvocationID(), response)
+	err = r.IritaHubChain.SendInterchainRequest(icRequest, callback)
 	if err != nil {
 		r.Logger.Printf(
-			"failed to send the response to %s: %s",
-			r.AppChain.GetChainID(),
+			"failed to send the interchain request %+v to %s: %s",
+			icRequest,
+			r.IritaHubChain.GetChainID(),
 			err,
-		)
-	} else {
-		r.Logger.Printf(
-			"response sent to %s successfully",
-			r.AppChain.GetChainID(),
 		)
 	}
 }

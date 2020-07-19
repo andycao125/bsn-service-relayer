@@ -16,6 +16,7 @@ type ChainI interface {
 type InterchainEventI interface {
     GetInvocationID() string // invocation ID getter
     GetServiceName()  string // service name getter
+    GetProvider()     string // provider getter
     GetInput()        string // request input getter
     GetTimeout()      uint64 // request timeout getter
 }
@@ -31,11 +32,29 @@ type ResponseI interface {
 ```
 
 ```go
+// IServiceMarketI defines the interface for the iService market on the application chain
+type IServiceMarketI interface {
+    // add a service binding to the iService market
+    AddServiceBinding(serviceName, schemas, provider, serviceFee string, qos uint64) error
+
+    // get the service fee by the service name and provider
+    GetServiceFee(serviceName string, provider string) (fee string, err error)
+}
+```
+
+```go
 // AppChainI defines the interface to interact with the application chain
 type AppChainI interface {
     ChainI
+
+    // listen to the interchain events with an event handler
     InterchainEventListener(cb func(icEvent InterchainEventI)) error
+
+    // send the response to the application chain
     SendResponse(invocationID string, response ResponseI) error
+
+    // iService market interface
+    IServiceMarketI
 }
 ```
 
@@ -56,8 +75,9 @@ type InterchainRequestI interface {
 // IritaHubChainI defines the interface to interact with IRITA-HUB
 type IritaHubChainI interface {
     ChainI
-    SendInterchainRequest(request InterchainRequestI) (icRequestID string, err error)
-    ResponseListener(icRequestID string) (ResponseI, error)
+
+    // send the interchain request and handle the response with the given callback
+    SendInterchainRequest(request InterchainRequestI, cb func(icRequestID string, response ResponseI)) error
 }
 ```
 
@@ -101,6 +121,7 @@ type ResponseAdaptor struct {
 type InterchainEvent struct {
     InvocationID string
     ServiceName  string
+    Provider     string
     Input        string
     Timeout      uint64
 }
@@ -113,6 +134,10 @@ func (e InterchainEvent) GetServiceName() string {
     return e.ServiceName
 }
 
+func (e InterchainEvent) GetProvider() string {
+    return e.Provider
+}
+
 func (e InterchainEvent) GetInput() string {
     return e.Input
 }
@@ -122,34 +147,34 @@ func (e InterchainEvent) GetTimeout() uint64 {
 }
 
 type FabricChain struct {
-    ChainID        string
     ChannelID      string
     PeerRPCAddrs   []string
     OrdererRPCAddr string
     Client         interface{}
-    Key            interface{}
+    Key            string
+    Passphrase     string
 }
 
 func NewFabricChain(
-    chainID string,
     channelID string,
     peerRPCAddrs []string,
     ordererRPCAddr string,
     client interface{},
-    key interface{},
+    key string,
+    Passphrase string,
 ) FabricChain {
     return FabricChain{
-        ChainID:        chainID,
         ChannelID:      channelID,
         PeerRPCAddrs:   peerRPCAddrs,
         OrdererRPCAddr: ordererRPCAddr,
         Client:         client,
         Key:            key,
+        Passphrase:     passphrase,
     }
 }
 
 func (fc FabricChain) GetChainID() string {
-    return fc.ChainID
+    return fc.ChannelID
 }
 
 func (fc FabricChain) InterchainEventListener(cb func(icEvent InterchainEventI)) error {
@@ -181,18 +206,20 @@ func (fc FabricChain) SendResponse(invocationID string, response ResponseI) erro
 
 ```go
 type IritaHubChain struct {
-    ChainID string
-    RPCAddr string
-    Client  interface{}
-    Key     interface{}
+    ChainID    string
+    RPCAddr    string
+    Client     interface{}
+    Key        string
+    Passphrase string
 }
 
-func NewIritaHubChain(chainID string, rpcAddr string, client interface{}, key interface{}) IritaHubChain {
+func NewIritaHubChain(chainID string, rpcAddr string, client interface{}, key string, passphrase string) IritaHubChain {
     return IritaHubChain{
-        ChainID: chainID,
-        RPCAddr: rpcAddr,
-        Client:  client,
-        Key:     key,
+        ChainID:    chainID,
+        RPCAddr:    rpcAddr,
+        Client:     client,
+        Key:        key,
+        Passphrase: passphrase,
         }
 }
 
@@ -200,19 +227,7 @@ func (ic IritaHubChain) GetChainID() string {
     return ic.ChainID
 }
 
-func (ic IritaHubChain) SendInterchainRequest(request InterchainRequestI) (icRequestID string, err error) {
-    return fmt.Sprintf("interchain-request-id-%d", rand.Int()), nil
-}
-
-func (ic IritaHubChain) ResponseListener(icRequestID string) (ResponseI, error) {
-    response := ResponseAdaptor{
-        StatusCode: 200,
-        Result: `{"code":"200","message":""}`,
-        Output: fmt.Sprintf(`{"rate":"%s"}`, rand.Int()),
-        ICRequestID: icRequestID,
-        ErrMsg: "",
-    }
-
-    return response, nil
+func (ic IritaHubChain) SendInterchainRequest(request InterchainRequestI, cb func(icRequestID string, response ResponseI)) error {
+    return nil
 }
 ```

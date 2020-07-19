@@ -2,7 +2,7 @@
 
 BSN Service Relayer is intended for interchain service invocation between application chains and IRITA-HUB in BSN ecosystem.
 
-The project is under development, with a mock implementation which is used to demonstrate the relayer working model and as a development reference.
+The project is under development, with a mock implementation used to demonstrate the relayer working model and as a development reference.
 
 ## Install
 
@@ -23,15 +23,14 @@ relayer -h
 Start the demo relayer:
 
 ```bash
-relayer fabric
+relayer start ./config
 ```
 
 ## Development
 
-See [Spec](./spec/design.md) for interfaces.
+See [Spec](./spec/design.md) for the application chain interfaces.
 
-Implement an application chain in `appchains` directory:
+Add an application chain in `appchains` directory:
 
-- Implement the `InterchainEventI` and `AppChainI`
-
-- Implement appchain-specific commands
+- Implementing the required interfaces
+- Add to `appchains/factory.go` for routing

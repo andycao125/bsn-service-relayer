@@ -5,9 +5,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	fabriccmd "relayer/appchains/fabric/cmd"
-	"relayer/common"
 )
 
 // rootCmd is the entry point
@@ -21,12 +18,7 @@ var (
 func main() {
 	cobra.EnableCommandSorting = false
 
-	// Add appchain-specific subcommands
-	appchainCmds := []*cobra.Command{fabriccmd.FabricCmd()}
-	rootCmd.AddCommand(appchainCmds...)
-
-	// Add common flags
-	common.AddCommonFlags(appchainCmds...)
+	rootCmd.AddCommand(StartCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
