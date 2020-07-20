@@ -3,15 +3,16 @@ package common
 import (
 	"os"
 
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
-var Log = logrus.New()
+// Logger is a logger instance
+var Logger = log.New()
 
 func init() {
-	Log.SetFormatter(&logrus.JSONFormatter{})
+	Logger.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 
-	Log.SetOutput(os.Stdout)
+	Logger.SetOutput(os.Stdout)
 
-	Log.SetLevel(logrus.WarnLevel)
+	Logger.SetLevel(log.InfoLevel)
 }

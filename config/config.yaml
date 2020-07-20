@@ -1,19 +1,21 @@
-# application chain name
-app_chain_name: fabric
+base:
+    # application chain name
+    app_chain_name: fabric
+
+# irita-hub config
+hub:
+    chain_id: irita-hub
+    node_rpc_addr: http://127.0.0.1:26657
+    key: node0
+    passphrase: 1234567890
+    db_root: .data/hub
 
 # fabric config
 fabric:
-    channel_id: test
+    channel_id: test-channel
     peer_rpc_addrs:
-      - 192.168.0.1
-      - 192.168.0.2
-    orderer_rpc_addr: 127.0.0.1
+      - grpc://127.0.0.1:7051
+      - grpc://127.0.0.1:7052
+    orderer_rpc_addr: grpc://127.0.0.1:7050
     key: test
-    passphrase: 1234567890
-
-# hub config
-hub:
-    chain_id: irita-hub
-    node_rpc_addr: 127.0.0.1
-    key: node0
     passphrase: 1234567890

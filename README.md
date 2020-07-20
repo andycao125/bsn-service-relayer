@@ -23,7 +23,7 @@ relayer -h
 Start the demo relayer:
 
 ```bash
-relayer start ./config
+relayer start ./config/config.yaml
 ```
 
 ## Development

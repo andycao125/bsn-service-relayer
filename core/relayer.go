@@ -42,7 +42,7 @@ func (r Relayer) HandleInterchainEvent(icEvent InterchainEventI) {
 
 	icRequest, err := r.BuildInterchainRequest(icEvent)
 	if err != nil {
-		r.Logger.Printf(
+		r.Logger.Errorf(
 			"failed to build the interchain request: %s",
 			err,
 		)
@@ -60,7 +60,7 @@ func (r Relayer) HandleInterchainEvent(icEvent InterchainEventI) {
 
 		err := r.AppChain.SendResponse(icEvent.GetInvocationID(), response)
 		if err != nil {
-			r.Logger.Printf(
+			r.Logger.Errorf(
 				"failed to send the response to %s: %s",
 				r.AppChain.GetChainID(),
 				err,
@@ -75,7 +75,7 @@ func (r Relayer) HandleInterchainEvent(icEvent InterchainEventI) {
 
 	err = r.IritaHubChain.SendInterchainRequest(icRequest, callback)
 	if err != nil {
-		r.Logger.Printf(
+		r.Logger.Errorf(
 			"failed to send the interchain request %+v to %s: %s",
 			icRequest,
 			r.IritaHubChain.GetChainID(),
@@ -88,7 +88,7 @@ func (r Relayer) HandleInterchainEvent(icEvent InterchainEventI) {
 func (r Relayer) Start() {
 	err := r.AppChain.InterchainEventListener(r.HandleInterchainEvent)
 	if err != nil {
-		r.Logger.Printf(
+		r.Logger.Errorf(
 			"failed to listen to the interchain event on %s",
 			r.AppChain.GetChainID(),
 		)

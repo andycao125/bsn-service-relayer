@@ -15,6 +15,7 @@ type IritaHubChain struct {
 	Client     iritaclient.IRITAClient
 	Key        string
 	Passphrase string
+	DBRoot     string
 }
 
 // NewIritaHubChain constructs a new Irita-Hub chain
@@ -23,27 +24,42 @@ func NewIritaHubChain(
 	rpcAddr string,
 	key string,
 	passphrase string,
+	dbRoot string,
 ) IritaHubChain {
+	if len(chainID) == 0 {
+		chainID = defaultChainID
+	}
+
+	if len(rpcAddr) == 0 {
+		rpcAddr = defaultNodeRPCAddr
+	}
+
+	if len(dbRoot) == 0 {
+		dbRoot = defaultDBRoot
+	}
+
+	config := iritasdk.ClientConfig{
+		NodeURI:   rpcAddr,
+		ChainID:   chainID,
+		Mode:      defaultMode,
+		DBRootDir: dbRoot,
+	}
+
 	hub := IritaHubChain{
 		ChainID:    chainID,
 		RPCAddr:    rpcAddr,
+		Client:     iritaclient.NewIRITAClient(config),
 		Key:        key,
 		Passphrase: passphrase,
+		DBRoot:     dbRoot,
 	}
-
-	config := defaultClientConfig
-	if len(rpcAddr) != 0 {
-		config.NodeURI = rpcAddr
-	}
-
-	hub.Client = iritaclient.NewIRITAClient(config)
 
 	return hub
 }
 
 // MakeIritaHubChain builds an Irita-Hub from the given config
 func MakeIritaHubChain(config Config) IritaHubChain {
-	return NewIritaHubChain(config.ChainID, config.NodeRPCAddr, config.Key, config.Passphrase)
+	return NewIritaHubChain(config.ChainID, config.NodeRPCAddr, config.Key, config.Passphrase, config.DBRoot)
 }
 
 // GetChainID implements IritaHubChainI

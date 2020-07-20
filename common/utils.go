@@ -19,10 +19,9 @@ func MustGetHomeDir() string {
 }
 
 // LoadYAMLConfig loads the YAML config file
-func LoadYAMLConfig(configPath, configFileName string) (*viper.Viper, error) {
+func LoadYAMLConfig(configFileName string) (*viper.Viper, error) {
 	v := viper.New()
 
-	v.AddConfigPath(configPath)
 	v.SetConfigFile(configFileName)
 	v.SetConfigType("yaml")
 

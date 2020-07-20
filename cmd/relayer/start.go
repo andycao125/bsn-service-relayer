@@ -13,30 +13,30 @@ import (
 func StartCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start [config-file-path]",
-		Short: "Start the relayer process with a config file path",
+		Short: "Start the relayer process with a config file",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			configPath := ""
+			configFileName := ""
 
 			if len(args) == 0 {
-				configPath = "./config/"
+				configFileName = common.DefaultConfigFileName
 			} else {
-				configPath = args[0]
+				configFileName = args[0]
 			}
 
-			config, err := common.LoadYAMLConfig(configPath, "config")
+			config, err := common.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}
 
-			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString("app_chain_name"))
+			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString(common.ConfigKeyAppChainName))
 			if err != nil {
 				return err
 			}
 
 			hubChain := hub.MakeIritaHubChain(hub.NewConfig(config))
 
-			relayerInstance := core.NewRelayer(hubChain, appChain, common.Log)
+			relayerInstance := core.NewRelayer(hubChain, appChain, common.Logger)
 			relayerInstance.Start()
 
 			return nil
