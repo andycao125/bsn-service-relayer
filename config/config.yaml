@@ -1,6 +1,6 @@
 base:
     # application chain name
-    app_chain_name: fabric
+    app_chain_name: eth
 
 # irita-hub config
 hub:
@@ -9,6 +9,15 @@ hub:
     key: node0
     passphrase: 1234567890
     db_root: .data/hub
+
+# ethereum config
+eth:
+    chain_id: ropsten
+    node_rpc_addr: ws://127.0.0.1:8546
+    IServiceCoreContract: 0x6dc3d7d44c3ce74c2a1af2d66ed4ac2093ded5e4
+    IServiceMarketContract: 0x1799681bdbfed2c9d38d74d6781001c0677efb86
+    key: test
+    passphrase: 1234567890
 
 # fabric config
 fabric:

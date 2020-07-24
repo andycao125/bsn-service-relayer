@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/viper"
 
+	"relayer/appchains/ethereum"
 	"relayer/appchains/fabric"
 	"relayer/core"
 )
@@ -25,6 +26,9 @@ func (f AppChainFactory) Make(chainName string) (core.AppChainI, error) {
 	switch strings.ToLower(chainName) {
 	case "fabric":
 		return fabric.MakeFabricChain(fabric.NewConfig(f.Config)), nil
+
+	case "eth":
+		return ethereum.MakeEthChain(ethereum.NewConfig(f.Config)), nil
 
 	default:
 		return nil, fmt.Errorf("application chain %s not supported", chainName)
