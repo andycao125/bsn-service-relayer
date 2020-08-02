@@ -3,17 +3,17 @@ pragma solidity ^0.6.0;
 import "../interfaces/iServiceInterface.sol";
 
 /**
- * @title Contract for exchange rate oracle powered by iService
+ * @title Contract for exchange rate service powered by iService
  */
-contract ExchangeRateOracle {
+contract ExchangeRateService {
     string public rate; // latest exchange rate
     
     iServiceInterface iServiceContract; // iService contract address 
     
     // iService request variables
-    string serviceName; // service name
-    string input; // request input
-    uint256 timeout; // request timeout
+    string serviceName = "exchange_rate"; // service name
+    string input = "{\"pair\":\"USD-CNY\"}"; // request input
+    uint256 timeout = 50; // request timeout
     
     // mapping the request id to RequestStatus
     mapping(bytes32 => RequestStatus) requests;
@@ -54,9 +54,17 @@ contract ExchangeRateOracle {
     {
         iServiceContract = iServiceInterface(_iServiceContract);
         
-        serviceName = _serviceName;
-        input = _input;
-        timeout = _timeout;
+        if (bytes(_serviceName).length > 0) {
+            serviceName = _serviceName;
+        }
+        
+        if (bytes(_input).length > 0) {
+            input = _input;
+        }
+        
+        if (_timeout > 0) {
+            timeout = _timeout;
+        }
     }
     
     /**
@@ -64,8 +72,8 @@ contract ExchangeRateOracle {
      * @param _requestID Request id
      */
     modifier validRequest(bytes32 _requestID) {
-        require(requests[_requestID].sent, "ExchangeRateOracle: request does not exist");
-        require(!requests[_requestID].responded, "ExchangeRateOracle: request has been responded");
+        require(requests[_requestID].sent, "ExchangeRateService: request does not exist");
+        require(!requests[_requestID].responded, "ExchangeRateService: request has been responded");
         
         _;
     }

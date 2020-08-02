@@ -14,20 +14,30 @@ type ChainI interface {
 ```go
 // InterchainEventI abstracts the event which is triggered for an interchain service invocation
 type InterchainEventI interface {
-    GetInvocationID() string // invocation ID getter
+    GetRequestID()    string // request ID getter
     GetServiceName()  string // service name getter
-    GetProvider()     string // provider getter
     GetInput()        string // request input getter
     GetTimeout()      uint64 // request timeout getter
 }
 ```
 
 ```go
-// ResponseI exposes the response related interfaces
+// ResponseI defines the response related interfaces
 type ResponseI interface {
-    GetICRequestID()  string // interchain request ID getter
-    GetResponse()     string // service response getter
-    GetError()        string // error msg getter
+    GetErrMsg()      string // error msg getter
+    GetOutput()      string // response output getter
+    GetICRequestID() string // interchain request ID getter
+}
+```
+
+```go
+// IServiceBinding defines an iService binding interface
+type IServiceBinding interface {
+    GetServiceName() string // service name getter
+    GetSchemas() string     // service schemas
+    GetProvider() string    // service provider
+    GetServiceFee() string  // service fee
+    GetQoS() uint64         // quality of service, in terms of the minimum response time
 }
 ```
 
@@ -37,8 +47,11 @@ type IServiceMarketI interface {
     // add a service binding to the iService market
     AddServiceBinding(serviceName, schemas, provider, serviceFee string, qos uint64) error
 
-    // get the service fee by the service name and provider
-    GetServiceFee(serviceName string, provider string) (fee string, err error)
+    // update the specified service binding
+    UpdateServiceBinding(serviceName, provider, serviceFee string, qos uint64) error
+
+    // get the service binding by the given service name from the iService market
+    GetServiceBinding(serviceName string) (IServiceBinding, error)
 }
 ```
 
@@ -51,7 +64,7 @@ type AppChainI interface {
     InterchainEventListener(cb func(icEvent InterchainEventI)) error
 
     // send the response to the application chain
-    SendResponse(invocationID string, response ResponseI) error
+    SendResponse(requestID string, response ResponseI) error
 
     // iService market interface
     IServiceMarketI
@@ -109,7 +122,6 @@ type ResponseAdaptor struct {
     Result       string
     Output       string
     ICRequestID  string
-    ErrMsg       string
 }
 ```
 
@@ -118,36 +130,63 @@ type ResponseAdaptor struct {
 ### 应用链
 
 ```go
-type InterchainEvent struct {
-    InvocationID string
-    ServiceName  string
-    Provider     string
-    Input        string
-    Timeout      uint64
+type IServiceRequestEvent struct {
+    RequestID   string
+    ServiceName string
+    Provider    string
+    Input       string
+    Timeout     uint64
 }
 
-func (e InterchainEvent) GetInvocationID() string {
-    return e.InvocationID
+func (e IServiceRequestEvent) GetRequestID() string {
+    return e.RequestID
 }
 
-func (e InterchainEvent) GetServiceName() string {
+func (e IServiceRequestEvent) GetServiceName() string {
     return e.ServiceName
 }
 
-func (e InterchainEvent) GetProvider() string {
-    return e.Provider
-}
-
-func (e InterchainEvent) GetInput() string {
+func (e IServiceRequestEvent) GetInput() string {
     return e.Input
 }
 
-func (e InterchainEvent) GetTimeout() uint64 {
+func (e IServiceRequestEvent) GetTimeout() uint64 {
     return e.Timeout
 }
 
+type ServiceBinding struct {
+    ServiceName string 
+    Schemas     string
+    Provider    string
+    ServiceFee  string
+    QoS         uint64
+}
+
+func (b ServiceBinding) GetServiceName() string {
+    return b.ServiceName
+}
+
+func (b ServiceBinding) GetSchemas() string {
+    return b.Schemas
+}
+
+func (b ServiceBinding) GetProvider() string {
+    return b.Provider
+}
+
+func (b ServiceBinding) GetServiceFee() string {
+    return b.ServiceFee
+}
+
+func (b ServiceBinding) GetQoS() uint64 {
+    return b.QoS
+}
+```
+
+```go
 type FabricChain struct {
     ChannelID      string
+    ChainCodeID    string
     PeerRPCAddrs   []string
     OrdererRPCAddr string
     Client         interface{}
@@ -157,6 +196,7 @@ type FabricChain struct {
 
 func NewFabricChain(
     channelID string,
+    chainCodeID string,
     peerRPCAddrs []string,
     ordererRPCAddr string,
     client interface{},
@@ -165,6 +205,7 @@ func NewFabricChain(
 ) FabricChain {
     return FabricChain{
         ChannelID:      channelID,
+        ChainCodeID:    chainCodeID,
         PeerRPCAddrs:   peerRPCAddrs,
         OrdererRPCAddr: ordererRPCAddr,
         Client:         client,
@@ -182,7 +223,7 @@ func (fc FabricChain) InterchainEventListener(cb func(icEvent InterchainEventI))
 
     for {
         icEvent := InterchainEvent{
-            InvocationID: fmt.Sprintf("invocation%d", i+1),
+            RequestID: fmt.Sprintf("request%d", i+1),
             ServiceName:  "exchange_rate",
             Input:        fmt.Sprintf(`{"name":"CNY-USD"}`),
             Timeout:      uint64(50),
@@ -197,8 +238,20 @@ func (fc FabricChain) InterchainEventListener(cb func(icEvent InterchainEventI))
     return nil
 }
 
-func (fc FabricChain) SendResponse(invocationID string, response ResponseI) error {
+func (fc FabricChain) SendResponse(requestID string, response ResponseI) error {
     return nil
+}
+
+func (fc FabricChain) AddServiceBinding(serviceName, schemas, provider, serviceFee string, qos uint64) error {
+    return nil
+}
+
+func (fc FabricChain) UpdateServiceBinding(serviceName, schemas, provider, serviceFee string, qos uint64) error {
+    return nil
+}
+
+func (fc FabricChain) GetServiceBinding(serviceName string) (IServiceBinding, error) {
+    return nil, nil
 }
 ```
 

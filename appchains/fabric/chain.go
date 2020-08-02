@@ -4,46 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"relayer/appchains/fabric/iservice"
 	"relayer/core"
 )
-
-// InterchainEvent is the Fabric event which represents an interchain service invocation to Irita-Hub
-type InterchainEvent struct {
-	InvocationID string
-	ServiceName  string
-	Provider     string
-	Input        string
-	Timeout      uint64
-}
-
-// GetInvocationID implements InterchainEventI
-func (e InterchainEvent) GetInvocationID() string {
-	return e.InvocationID
-}
-
-// GetServiceName implements InterchainEventI
-func (e InterchainEvent) GetServiceName() string {
-	return e.ServiceName
-}
-
-// GetProvider implements InterchainEventI
-func (e InterchainEvent) GetProvider() string {
-	return e.Provider
-}
-
-// GetInput implements InterchainEventI
-func (e InterchainEvent) GetInput() string {
-	return e.Input
-}
-
-// GetTimeout implements InterchainEventI
-func (e InterchainEvent) GetTimeout() uint64 {
-	return e.Timeout
-}
 
 // FabricChain defines the Fabric chain
 type FabricChain struct {
 	ChannelID      string
+	ChainCodeID    string
 	PeerRPCAddrs   []string
 	OrdererRPCAddr string
 	Client         interface{}
@@ -54,6 +22,7 @@ type FabricChain struct {
 // NewFabricChain constructs a new FabricChain instance
 func NewFabricChain(
 	channelID string,
+	chainCodeID string,
 	peerRPCAddrs []string,
 	ordererRPCAddr string,
 	key string,
@@ -61,9 +30,11 @@ func NewFabricChain(
 ) FabricChain {
 	fabric := FabricChain{
 		ChannelID:      channelID,
+		ChainCodeID:    chainCodeID,
 		PeerRPCAddrs:   peerRPCAddrs,
 		OrdererRPCAddr: ordererRPCAddr,
 		Key:            key,
+		Passphrase:     passphrase,
 	}
 
 	fabric.Client = nil
@@ -75,6 +46,7 @@ func NewFabricChain(
 func MakeFabricChain(config Config) FabricChain {
 	return NewFabricChain(
 		config.ChannelID,
+		config.ChainCodeID,
 		config.PeerRPCAddrs,
 		config.OrdererRPCAddr,
 		config.Key,
@@ -92,14 +64,14 @@ func (fc FabricChain) InterchainEventListener(cb core.InterchainEventHandler) er
 	i := 0
 
 	for {
-		icEvent := InterchainEvent{
-			InvocationID: fmt.Sprintf("invocation%d", i+1),
-			ServiceName:  "exchange_rate",
-			Input:        fmt.Sprintf(`{"name":"CNY-USD"}`),
-			Timeout:      uint64(50),
+		event := iservice.IServiceRequestEvent{
+			RequestID:   fmt.Sprintf("request%d", i+1),
+			ServiceName: "exchange_rate",
+			Input:       fmt.Sprintf(`{"name":"CNY-USD"}`),
+			Timeout:     uint64(50),
 		}
 
-		cb(icEvent)
+		cb(event)
 
 		time.Sleep(10 * time.Second)
 		i++
@@ -107,7 +79,7 @@ func (fc FabricChain) InterchainEventListener(cb core.InterchainEventHandler) er
 }
 
 // SendResponse implements AppChainI
-func (fc FabricChain) SendResponse(invocationID string, response core.ResponseI) error {
+func (fc FabricChain) SendResponse(requestID string, response core.ResponseI) error {
 	return nil
 }
 
@@ -116,7 +88,15 @@ func (fc FabricChain) AddServiceBinding(serviceName, schemas, provider, serviceF
 	return nil
 }
 
-// GetServiceFee implements AppChainI
-func (fc FabricChain) GetServiceFee(serviceName string, provider string) (fee string, err error) {
-	return "100point", nil
+// UpdateServiceBinding implements AppChainI
+func (fc FabricChain) UpdateServiceBinding(serviceName, provider, serviceFee string, qos uint64) error {
+	return nil
+}
+
+// GetServiceBinding implements AppChainI
+func (fc FabricChain) GetServiceBinding(serviceName string) (core.IServiceBinding, error) {
+	return iservice.ServiceBinding{
+		Provider:   "test-provider",
+		ServiceFee: "100point",
+	}, nil
 }

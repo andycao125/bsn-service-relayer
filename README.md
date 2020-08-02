@@ -14,16 +14,42 @@ make install
 
 ## Start
 
-Get help information by:
+### Irita-Hub
+
+Make sure that Irita-Hub installed and the iService service(s) deployed.
+
+### AppChain
+
+Make sure that the application chain is running
+
+### Key
+
+#### Add Irita-Hub key
 
 ```bash
-relayer -h
+relayer hub keys add [name] [passphrase]
 ```
 
-Start the demo relayer:
+### Configure
+
+Configure the relayer according to the Irita-Hub and AppChain, default to `./config/config.yaml`
+
+### Relayer
+
+Start the relayer process:
 
 ```bash
-relayer start ./config/config.yaml
+relayer start
+```
+
+### Add or Update the service binding to the iService market on the application chain
+
+```bash
+relayer appchain add-svc-binding [args]
+```
+
+```bash
+relayer appchain update-svc-binding [args]
 ```
 
 ## Development
@@ -34,3 +60,4 @@ Add an application chain in `appchains` directory:
 
 - Implementing the required interfaces
 - Add to `appchains/factory.go` for routing
+- Optionally, Add test to `tests` directory

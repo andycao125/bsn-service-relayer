@@ -21,7 +21,7 @@ type AppChainI interface {
 	InterchainEventListener(cb InterchainEventHandler) error
 
 	// send the response to the application chain
-	SendResponse(invocationID string, response ResponseI) error
+	SendResponse(requestID string, response ResponseI) error
 
 	// iService market interface
 	IServiceMarketI
@@ -29,11 +29,10 @@ type AppChainI interface {
 
 // InterchainEventI abstracts the event which is triggered for an interchain service invocation
 type InterchainEventI interface {
-	GetInvocationID() string // invocation ID getter
-	GetServiceName() string  // service name getter
-	GetProvider() string     // provider getter
-	GetInput() string        // request input getter
-	GetTimeout() uint64      // request timeout getter
+	GetRequestID() string   // request ID getter
+	GetServiceName() string // service name getter
+	GetInput() string       // request input getter
+	GetTimeout() uint64     // request timeout getter
 }
 
 // InterchainRequestI is an interface for the interchain request
@@ -45,20 +44,21 @@ type InterchainRequestI interface {
 	GetServiceFeeCap() string // service fee cap getter
 }
 
-// ResponseI exposes the response related interfaces
+// ResponseI defines the response related interfaces
 type ResponseI interface {
+	GetErrMsg() string              // error msg getter
+	GetOutput() string              // response output getter
 	GetInterchainRequestID() string // interchain request ID getter
-	GetResponse() string            // service response getter
-	GetError() string               // error msg getter
 }
 
 // KeyManager defines the key management interface
 type KeyManager interface {
 	Add(name, passphrase string) (addr string, mnemonic string, err error)
-	Delete(name string) error
-	Get(name string) (addr string, err error)
-	Import(name, passphrase, keystore string) error
-	Export(name, passphrase, encryptPassphrase string) (keystore string, err error)
+	Delete(name, passphrase string) error
+	Show(name, passphrase string) (addr string, err error)
+	Import(name, passphrase, keyArmor string) error
+	Export(name, passphrase string) (keyArmor string, err error)
+	Recover(name, passphrase, mnemonic string) (addr string, err error)
 }
 
 // IServiceMarketI defines the interface for the iService market on the application chain
@@ -66,8 +66,20 @@ type IServiceMarketI interface {
 	// add a service binding to the iService market
 	AddServiceBinding(serviceName, schemas, provider, serviceFee string, qos uint64) error
 
-	// get the service fee by the given service name and provider
-	GetServiceFee(serviceName string, provider string) (fee string, err error)
+	// update the specified service binding
+	UpdateServiceBinding(serviceName, provider, serviceFee string, qos uint64) error
+
+	// get the service binding by the given service name from the iService market
+	GetServiceBinding(serviceName string) (IServiceBinding, error)
+}
+
+// IServiceBinding defines an iService binding interface
+type IServiceBinding interface {
+	GetServiceName() string // service name getter
+	GetSchemas() string     // service schemas
+	GetProvider() string    // service provider
+	GetServiceFee() string  // service fee
+	GetQoS() uint64         // quality of service
 }
 
 // InterchainEventHandler defines the interchain event callback interface

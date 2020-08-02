@@ -6,18 +6,22 @@ base:
 hub:
     chain_id: irita-hub
     node_rpc_addr: http://127.0.0.1:26657
-    key: node0
-    passphrase: 1234567890
-    db_root: .data/hub
+    key_path: .data/hub
+    key_name: test
+    passphrase: 123456789
 
 # ethereum config
 eth:
     chain_id: ropsten
-    node_rpc_addr: ws://127.0.0.1:8546
-    IServiceCoreContract: 0x6dc3d7d44c3ce74c2a1af2d66ed4ac2093ded5e4
-    IServiceMarketContract: 0x1799681bdbfed2c9d38d74d6781001c0677efb86
-    key: test
-    passphrase: 1234567890
+    node_rpc_addr: wss://ropsten.infura.io/ws/v3/56e89587eacb4fbe8655e4c44b146237
+    gas_limit: 5000000
+    gas_price: 5000000000
+    key: 5dee232c8be5cb81f0ae6fddb45243fc6208192c16aef275ef41b019df765d1f
+    passphrase: 123456789
+    iservice_core_addr: 0x79b6c1ab5dbeba4879bfbea35a78fac8e6c73c92
+    iservice_market_addr: 0x87e71e95fbd95d66e307edaeb7974c1f17f87a82
+    iservice_event_name: ServiceInvoked
+    iservice_event_sig: ServiceInvoked(bytes32,string,string,uint256)
 
 # fabric config
 fabric:
@@ -27,4 +31,4 @@ fabric:
       - grpc://127.0.0.1:7052
     orderer_rpc_addr: grpc://127.0.0.1:7050
     key: test
-    passphrase: 1234567890
+    passphrase: 123456789

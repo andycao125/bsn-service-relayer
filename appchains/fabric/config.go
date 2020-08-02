@@ -3,12 +3,13 @@ package fabric
 import (
 	"github.com/spf13/viper"
 
-	"relayer/common"
+	cmn "relayer/common"
 )
 
 const (
 	Prefix         = "fabric"
 	ChannelID      = "channel_id"
+	ChainCodeID    = "chaincode_id"
 	PeerRPCAddrs   = "peer_rpc_addrs"
 	OrdererRPCAddr = "orderer_rpc_addr"
 	Key            = "key"
@@ -18,6 +19,7 @@ const (
 // Config represents the Fabric chain config
 type Config struct {
 	ChannelID      string   `yaml:"channel_id"`
+	ChainCodeID    string   `yaml:"chaincode_id"`
 	PeerRPCAddrs   []string `yaml:"peer_rpc_addrs"`
 	OrdererRPCAddr string   `yaml:"orderer_rpc_addr"`
 	Key            string   `yaml:"key"`
@@ -27,10 +29,11 @@ type Config struct {
 // NewConfig constructs a new Config from viper
 func NewConfig(v *viper.Viper) Config {
 	return Config{
-		ChannelID:      v.GetString(common.GetConfigKeyName(Prefix, ChannelID)),
-		PeerRPCAddrs:   v.GetStringSlice(common.GetConfigKeyName(Prefix, PeerRPCAddrs)),
-		OrdererRPCAddr: v.GetString(common.GetConfigKeyName(Prefix, OrdererRPCAddr)),
-		Key:            v.GetString(common.GetConfigKeyName(Prefix, Key)),
-		Passphrase:     v.GetString(common.GetConfigKeyName(Prefix, Passphrase)),
+		ChannelID:      v.GetString(cmn.GetConfigKey(Prefix, ChannelID)),
+		ChainCodeID:    v.GetString(cmn.GetConfigKey(Prefix, ChainCodeID)),
+		PeerRPCAddrs:   v.GetStringSlice(cmn.GetConfigKey(Prefix, PeerRPCAddrs)),
+		OrdererRPCAddr: v.GetString(cmn.GetConfigKey(Prefix, OrdererRPCAddr)),
+		Key:            v.GetString(cmn.GetConfigKey(Prefix, Key)),
+		Passphrase:     v.GetString(cmn.GetConfigKey(Prefix, Passphrase)),
 	}
 }

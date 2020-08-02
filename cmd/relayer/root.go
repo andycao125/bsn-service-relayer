@@ -19,6 +19,8 @@ func main() {
 	cobra.EnableCommandSorting = false
 
 	rootCmd.AddCommand(StartCmd())
+	rootCmd.AddCommand(HubCmd)
+	rootCmd.AddCommand(AppChainCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

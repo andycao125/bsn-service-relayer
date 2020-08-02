@@ -40,27 +40,37 @@ type ResponseAdaptor struct {
 	Result      string
 	Output      string
 	ICRequestID string
-	ErrMsg      string
 }
 
-// GetInterchainRequestID implements ResponseI
-func (r ResponseAdaptor) GetInterchainRequestID() string {
-	return r.ICRequestID
-}
-
-// GetResponse implements ResponseI
-func (r ResponseAdaptor) GetResponse() string {
+// GetErrMsg implements ResponseI
+func (r ResponseAdaptor) GetErrMsg() string {
 	switch r.StatusCode {
 	case 200:
-		return r.Output
+		return ""
+
 	case 400, 500:
 		return r.Result
+
 	default:
 		return ""
 	}
 }
 
-// GetError implements ResponseI
-func (r ResponseAdaptor) GetError() string {
-	return r.ErrMsg
+// GetOutput implements ResponseI
+func (r ResponseAdaptor) GetOutput() string {
+	switch r.StatusCode {
+	case 200:
+		return r.Output
+
+	case 400, 500:
+		return r.Result
+
+	default:
+		return ""
+	}
+}
+
+// GetInterchainRequestID implements ResponseI
+func (r ResponseAdaptor) GetInterchainRequestID() string {
+	return r.ICRequestID
 }
