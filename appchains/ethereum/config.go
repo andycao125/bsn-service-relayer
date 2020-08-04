@@ -3,7 +3,7 @@ package ethereum
 import (
 	"github.com/spf13/viper"
 
-	cmn "relayer/common"
+	cfg "relayer/config"
 )
 
 const (
@@ -40,15 +40,15 @@ type Config struct {
 // NewConfig constructs a new Config from viper
 func NewConfig(v *viper.Viper) Config {
 	return Config{
-		ChainID:            v.GetString(cmn.GetConfigKey(Prefix, ChainID)),
-		NodeRPCAddr:        v.GetString(cmn.GetConfigKey(Prefix, NodeRPCAddr)),
-		GasLimit:           v.GetUint64(cmn.GetConfigKey(Prefix, GasLimit)),
-		GasPrice:           v.GetUint64(cmn.GetConfigKey(Prefix, GasPrice)),
-		Key:                v.GetString(cmn.GetConfigKey(Prefix, Key)),
-		Passphrase:         v.GetString(cmn.GetConfigKey(Prefix, Passphrase)),
-		IServiceCoreAddr:   v.GetString(cmn.GetConfigKey(Prefix, IServiceCoreAddr)),
-		IServiceMarketAddr: v.GetString(cmn.GetConfigKey(Prefix, IServiceMarketAddr)),
-		IServiceEventName:  v.GetString(cmn.GetConfigKey(Prefix, IServiceEventName)),
-		IServiceEventSig:   v.GetString(cmn.GetConfigKey(Prefix, IServiceEventSig)),
+		ChainID:            v.GetString(cfg.GetConfigKey(Prefix, ChainID)),
+		NodeRPCAddr:        v.GetString(cfg.GetConfigKey(Prefix, NodeRPCAddr)),
+		GasLimit:           v.GetUint64(cfg.GetConfigKey(Prefix, GasLimit)),
+		GasPrice:           v.GetUint64(cfg.GetConfigKey(Prefix, GasPrice)),
+		Key:                v.GetString(cfg.GetConfigKey(Prefix, Key)),
+		Passphrase:         v.GetString(cfg.GetConfigKey(Prefix, Passphrase)),
+		IServiceCoreAddr:   v.GetString(cfg.GetConfigKey(Prefix, IServiceCoreAddr)),
+		IServiceMarketAddr: v.GetString(cfg.GetConfigKey(Prefix, IServiceMarketAddr)),
+		IServiceEventName:  v.GetString(cfg.GetConfigKey(Prefix, IServiceEventName)),
+		IServiceEventSig:   v.GetString(cfg.GetConfigKey(Prefix, IServiceEventSig)),
 	}
 }

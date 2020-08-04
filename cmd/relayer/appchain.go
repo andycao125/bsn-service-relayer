@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"relayer/appchains"
-	cmn "relayer/common"
+	cfg "relayer/config"
 )
 
 var (
@@ -27,7 +27,7 @@ func AddServiceBindingCmd() *cobra.Command {
 			configFileName := ""
 
 			if len(args) == 5 {
-				configFileName = cmn.DefaultConfigFileName
+				configFileName = cfg.DefaultConfigFileName
 			} else {
 				configFileName = args[5]
 			}
@@ -37,12 +37,12 @@ func AddServiceBindingCmd() *cobra.Command {
 				return err
 			}
 
-			config, err := cmn.LoadYAMLConfig(configFileName)
+			config, err := cfg.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}
 
-			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString(cmn.ConfigKeyAppChainName))
+			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString(cfg.ConfigKeyAppChainName))
 			if err != nil {
 				return err
 			}
@@ -71,7 +71,7 @@ func UpdateServiceBindingCmd() *cobra.Command {
 			configFileName := ""
 
 			if len(args) == 4 {
-				configFileName = cmn.DefaultConfigFileName
+				configFileName = cfg.DefaultConfigFileName
 			} else {
 				configFileName = args[4]
 			}
@@ -81,12 +81,12 @@ func UpdateServiceBindingCmd() *cobra.Command {
 				return err
 			}
 
-			config, err := cmn.LoadYAMLConfig(configFileName)
+			config, err := cfg.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}
 
-			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString(cmn.ConfigKeyAppChainName))
+			appChain, err := appchains.NewAppChainFactory(config).Make(config.GetString(cfg.ConfigKeyAppChainName))
 			if err != nil {
 				return err
 			}

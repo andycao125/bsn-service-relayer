@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"relayer/common"
+	cfg "relayer/config"
 	"relayer/hub"
 )
 
@@ -31,12 +31,12 @@ func KeysAddCmd() *cobra.Command {
 			configFileName := ""
 
 			if len(args) == 2 {
-				configFileName = common.DefaultConfigFileName
+				configFileName = cfg.DefaultConfigFileName
 			} else {
 				configFileName = args[2]
 			}
 
-			config, err := common.LoadYAMLConfig(configFileName)
+			config, err := cfg.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}
@@ -67,12 +67,12 @@ func KeysShowCmd() *cobra.Command {
 			configFileName := ""
 
 			if len(args) == 2 {
-				configFileName = common.DefaultConfigFileName
+				configFileName = cfg.DefaultConfigFileName
 			} else {
 				configFileName = args[2]
 			}
 
-			config, err := common.LoadYAMLConfig(configFileName)
+			config, err := cfg.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}
@@ -103,12 +103,12 @@ func KeysImportCmd() *cobra.Command {
 			configFileName := ""
 
 			if len(args) == 3 {
-				configFileName = common.DefaultConfigFileName
+				configFileName = cfg.DefaultConfigFileName
 			} else {
 				configFileName = args[2]
 			}
 
-			config, err := common.LoadYAMLConfig(configFileName)
+			config, err := cfg.LoadYAMLConfig(configFileName)
 			if err != nil {
 				return err
 			}

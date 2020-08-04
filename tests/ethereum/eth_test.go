@@ -14,7 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
-	cmn "relayer/common"
+	cfg "relayer/config"
 	ethtesting "relayer/tests/ethereum"
 )
 
@@ -32,7 +32,7 @@ func TestEthTestSuite(t *testing.T) {
 }
 
 func (suite *EthTestSuite) SetupTest() {
-	config, err := cmn.LoadYAMLConfig("../config.yaml")
+	config, err := cfg.LoadYAMLConfig("../config.yaml")
 	suite.NoError(err)
 
 	suite.config = config

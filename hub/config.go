@@ -6,6 +6,7 @@ import (
 	iritasdk "gitlab.bianjie.ai/irita/irita-sdk-go/types"
 
 	cmn "relayer/common"
+	cfg "relayer/config"
 )
 
 // default config variables
@@ -40,10 +41,10 @@ type Config struct {
 // NewConfig constructs a new Config from viper
 func NewConfig(v *viper.Viper) Config {
 	return Config{
-		ChainID:     v.GetString(cmn.GetConfigKey(Prefix, ChainID)),
-		NodeRPCAddr: v.GetString(cmn.GetConfigKey(Prefix, NodeRPCAddr)),
-		KeyPath:     v.GetString(cmn.GetConfigKey(Prefix, KeyPath)),
-		KeyName:     v.GetString(cmn.GetConfigKey(Prefix, KeyName)),
-		Passphrase:  v.GetString(cmn.GetConfigKey(Prefix, Passphrase)),
+		ChainID:     v.GetString(cfg.GetConfigKey(Prefix, ChainID)),
+		NodeRPCAddr: v.GetString(cfg.GetConfigKey(Prefix, NodeRPCAddr)),
+		KeyPath:     v.GetString(cfg.GetConfigKey(Prefix, KeyPath)),
+		KeyName:     v.GetString(cfg.GetConfigKey(Prefix, KeyName)),
+		Passphrase:  v.GetString(cfg.GetConfigKey(Prefix, Passphrase)),
 	}
 }

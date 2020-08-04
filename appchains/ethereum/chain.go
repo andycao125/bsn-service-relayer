@@ -16,8 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"relayer/appchains/ethereum/iservice"
-	cmn "relayer/common"
 	"relayer/core"
+	"relayer/logging"
 )
 
 // EthChain defines the Ethereum chain
@@ -57,27 +57,27 @@ func NewEthChain(
 ) EthChain {
 	iServiceCoreABI, err := ParseABI(iservice.IServiceCoreExABI)
 	if err != nil {
-		cmn.Logger.Panicf("failed to parse iservice core abi: %s", err)
+		logging.Logger.Panicf("failed to parse iservice core abi: %s", err)
 	}
 
 	iServiceMarketABI, err := ParseABI(iservice.IServiceMarketExABI)
 	if err != nil {
-		cmn.Logger.Panicf("failed to parse iservice market abi: %s", err)
+		logging.Logger.Panicf("failed to parse iservice market abi: %s", err)
 	}
 
 	client, err := ethclient.Dial(nodeRPCAddr)
 	if err != nil {
-		cmn.Logger.Panicf("failed to connect to %s: %s", nodeRPCAddr, err)
+		logging.Logger.Panicf("failed to connect to %s: %s", nodeRPCAddr, err)
 	}
 
 	iServiceCoreContract, err := iservice.NewIServiceCoreEx(ethcmn.HexToAddress(iServiceCoreAddr), client)
 	if err != nil {
-		cmn.Logger.Panicf("failed to instantiate the iservice core contract: %s", err)
+		logging.Logger.Panicf("failed to instantiate the iservice core contract: %s", err)
 	}
 
 	iServiceMarketContract, err := iservice.NewIServiceMarketEx(ethcmn.HexToAddress(iServiceMarketAddr), client)
 	if err != nil {
-		cmn.Logger.Panicf("failed to instantiate the iservice market contract: %s", err)
+		logging.Logger.Panicf("failed to instantiate the iservice market contract: %s", err)
 	}
 
 	eth := EthChain{
@@ -143,7 +143,7 @@ func (ec EthChain) InterchainEventListener(cb core.InterchainEventHandler) error
 		iServiceRequestEvent, err := ec.parseLog(log)
 
 		if err != nil {
-			cmn.Logger.Errorf("failed to parse log %+v: %s", log, err)
+			logging.Logger.Errorf("failed to parse log %+v: %s", log, err)
 		} else {
 			cb(iServiceRequestEvent)
 		}
@@ -266,7 +266,7 @@ func (ec EthChain) logListener(sub ethereum.Subscription, logChan chan ethtypes.
 		case log := <-logChan:
 			handler(log)
 		case err := <-sub.Err():
-			cmn.Logger.Errorf("Error on log subscription: %s", err)
+			logging.Logger.Errorf("Error on log subscription: %s", err)
 		}
 	}
 }
@@ -285,7 +285,7 @@ func (ec EthChain) parseLog(log ethtypes.Log) (iservice.IServiceRequestEvent, er
 
 // waitForReceipt waits for the receipt of the given tx
 func (ec EthChain) waitForReceipt(tx *ethtypes.Transaction, name string) error {
-	cmn.Logger.Infof("%s: transaction sent to %s, hash: %s", name, ec.GetChainID(), tx.Hash().Hex())
+	logging.Logger.Infof("%s: transaction sent to %s, hash: %s", name, ec.GetChainID(), tx.Hash().Hex())
 
 	receipt, err := bind.WaitMined(context.Background(), ec.Client, tx)
 	if err != nil {

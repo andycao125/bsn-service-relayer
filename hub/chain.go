@@ -8,8 +8,8 @@ import (
 	iritasdk "gitlab.bianjie.ai/irita/irita-sdk-go/types"
 	"gitlab.bianjie.ai/irita/irita-sdk-go/types/store"
 
-	cmn "relayer/common"
 	"relayer/core"
+	"relayer/logging"
 )
 
 // IritaHubChain defines the Irita-Hub chain
@@ -94,7 +94,7 @@ func (ic IritaHubChain) SendInterchainRequest(
 		return err
 	}
 
-	cmn.Logger.Infof("request context created on %s: %s", ic.ChainID, reqCtxID)
+	logging.Logger.Infof("request context created on %s: %s", ic.ChainID, reqCtxID)
 
 	requests, err := ic.Client.Service.QueryRequestsByReqCtx(reqCtxID, 1)
 	if err != nil {
@@ -105,7 +105,7 @@ func (ic IritaHubChain) SendInterchainRequest(
 		return fmt.Errorf("no service request initiated on %s", ic.ChainID)
 	}
 
-	cmn.Logger.Infof("service request initiated on %s: %s", ic.ChainID, requests[1].ID)
+	logging.Logger.Infof("service request initiated on %s: %s", ic.ChainID, requests[1].ID)
 
 	return ic.ResponseListener(reqCtxID, cb)
 }
@@ -140,7 +140,7 @@ func (ic IritaHubChain) ResponseListener(reqCtxID string, cb core.ResponseCallba
 		cb(requestID, resp)
 	}
 
-	cmn.Logger.Infof("waiting for the service response on %s", ic.ChainID)
+	logging.Logger.Infof("waiting for the service response on %s", ic.ChainID)
 
 	_, err := ic.Client.Service.SubscribeServiceResponse(reqCtxID, callbackWrapper)
 	if err != nil {

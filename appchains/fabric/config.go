@@ -3,7 +3,7 @@ package fabric
 import (
 	"github.com/spf13/viper"
 
-	cmn "relayer/common"
+	cfg "relayer/config"
 )
 
 const (
@@ -29,11 +29,11 @@ type Config struct {
 // NewConfig constructs a new Config from viper
 func NewConfig(v *viper.Viper) Config {
 	return Config{
-		ChannelID:      v.GetString(cmn.GetConfigKey(Prefix, ChannelID)),
-		ChainCodeID:    v.GetString(cmn.GetConfigKey(Prefix, ChainCodeID)),
-		PeerRPCAddrs:   v.GetStringSlice(cmn.GetConfigKey(Prefix, PeerRPCAddrs)),
-		OrdererRPCAddr: v.GetString(cmn.GetConfigKey(Prefix, OrdererRPCAddr)),
-		Key:            v.GetString(cmn.GetConfigKey(Prefix, Key)),
-		Passphrase:     v.GetString(cmn.GetConfigKey(Prefix, Passphrase)),
+		ChannelID:      v.GetString(cfg.GetConfigKey(Prefix, ChannelID)),
+		ChainCodeID:    v.GetString(cfg.GetConfigKey(Prefix, ChainCodeID)),
+		PeerRPCAddrs:   v.GetStringSlice(cfg.GetConfigKey(Prefix, PeerRPCAddrs)),
+		OrdererRPCAddr: v.GetString(cfg.GetConfigKey(Prefix, OrdererRPCAddr)),
+		Key:            v.GetString(cfg.GetConfigKey(Prefix, Key)),
+		Passphrase:     v.GetString(cfg.GetConfigKey(Prefix, Passphrase)),
 	}
 }
